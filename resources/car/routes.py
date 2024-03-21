@@ -1,53 +1,49 @@
 from flask import request
-from app import app
+from flask.views import MethodView
+from uuid import uuid4
 
+from schemas import CarSchema
+from . import bp
 from db import cars
 
-
-@app.route('/cars')
-def get_cars():
-    return {
-        'cars' : list(cars.values())
-    }
+@bp.route('/car')
+class CarList(MethodView):
     
-@app.route('/cars/<int:id>')
-def get_ind_car(id):
-    if id in cars:
-        return {
-            'car' : cars[id]
-        }
-    return {
-        'OU OH, something went wrong' : 'Invalid car id'
-    }
+    @bp.response(200, CarSchema(many=True))
+    def get(self):
+        return list(cars.values())
+    
+    @bp.arguments(CarSchema)
+    @bp.response(201, CarSchema)
+    def post(self, data):
+ 
+        car_id = uuid4().hex
+        cars[car_id] = data
+        return cars[car_id]
 
-@app.route('/car', methods = ["POST"])
-def create_car():
-    data = request.get_json()
-    cars[data["id"]] = data
-    return {
-        'car created successfully' : cars[data["id"]]
-    }    
-
-@app.route('/car', methods = ["PUT"])
-def update_car():
-    data=request.get_json()
-    if data['id'] in cars:
-        cars[data['id']] = data
+@bp.route('/car/<id>')
+class Car(MethodView):
+    
+    @bp.response(200, CarSchema)
+    def get(self, id):
+        if id in cars:
+            return cars[id]
         return {
-            'car updated' : cars[data["id"]]
-        }
-    return {
-        'err' :'err'
-    }
+            'UH OH, something went wrong' : "invalid car id"
+        }, 400
 
-@app.route('/car', methods = ["DELETE"])
-def delete_car():
-    data=request.get_json()
-    if data['id'] in cars:
-        del cars[data["id"]]
-        return {
-            'car deleted' : f"{data['make']} is no more...."
-        }
-    return {
-        'err' :"can't delete that car that they aren't there"
-    }
+    @bp.arguments(CarSchema)
+    def put(self, data, id):
+        data = request.get_json()
+        if id in cars:
+            cars[id] = data
+            return { 'car updated' : cars[id] }, 201
+        return {'err' : 'no car found with that id'}, 401
+
+    def delete(self, id):
+        data = request.get_json()
+        if id in cars:
+            del cars[id]
+            return { 'car gone': f"{data['vehicle']} is no more. . . " }, 202
+        return { 'err' : "can't delete that car they aren't there. . . " } , 400
+

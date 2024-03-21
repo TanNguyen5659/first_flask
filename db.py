@@ -1,15 +1,15 @@
 cars = {
-    1:{
+    '1':{
         'id' : 1,
         'make': 'Tesla',
         'model' : 'S'
     },
-    2:{
+    '2':{
         'id' : 2,
         'make': 'Tesla',
         'model' : 'Cybertruck'
     },
-    3:{
+    '3':{
         'id' : 3,
         'make': 'Rivian',
         'model' : 'R1S'
