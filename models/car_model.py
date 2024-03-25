@@ -23,8 +23,7 @@ class CarModel(db.Model):
 
     def from_dict(self, car_dict):
         for k , v in car_dict.items():
-            if k:
-                setattr(self, k, v)
+            setattr(self, k, v)
             # else:
             #     setattr(self, 'password_hash', generate_password_hash(v))
 
