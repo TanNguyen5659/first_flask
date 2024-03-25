@@ -9,7 +9,7 @@ class CarModel(db.Model):
     __tablename__ = 'cars'
 
     id = db.Column(db.Integer, primary_key = True)
-    carmake = db.Column(db.String(50), nullable = False, unique = True)
+    carmake = db.Column(db.String(50))
     dealer = db.Column(db.String(50))
     model= db.Column(db.String(75))
 
@@ -23,10 +23,10 @@ class CarModel(db.Model):
 
     def from_dict(self, car_dict):
         for k , v in car_dict.items():
-            if k != 'password':
+            if k:
                 setattr(self, k, v)
-            else:
-                setattr(self, 'password_hash', generate_password_hash(v))
+            # else:
+            #     setattr(self, 'password_hash', generate_password_hash(v))
 
 
 
