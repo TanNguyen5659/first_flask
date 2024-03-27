@@ -12,6 +12,10 @@ class CarModel(db.Model):
     carmake = db.Column(db.String(50))
     dealer = db.Column(db.String(50))
     model= db.Column(db.String(75))
+    password_hash = db.Column(db.String, nullable = False)
+    posts = db.relationship("PostModel", back_populates = "author", lazy = 'dynamic')
+
+
 
     def save_car(self):
         db.session.add(self)
@@ -21,12 +25,12 @@ class CarModel(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def from_dict(self, car_dict):
-        for k , v in car_dict.items():
-            setattr(self, k, v)
-            # else:
-            #     setattr(self, 'password_hash', generate_password_hash(v))
-
+    def from_dict(self, user_dict):
+        for k , v in user_dict.items():
+            if k != 'password':
+                setattr(self, k, v)
+            else:
+                setattr(self, 'password_hash', generate_password_hash(v))
 
 
 
