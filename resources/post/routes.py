@@ -8,9 +8,12 @@ from models.post_model import PostModel
 from . import bp
 from schemas import PostSchema
 from db import cars, posts
+from flask_jwt_extended import jwt_required
 
 @bp.route('/post/')
 class PostList(MethodView):
+    
+    @jwt_required()
     
     @bp.arguments(PostSchema)
     @bp.response(201, PostSchema)

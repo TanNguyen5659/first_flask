@@ -32,6 +32,9 @@ class CarModel(db.Model):
             else:
                 setattr(self, 'password_hash', generate_password_hash(v))
 
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+
 
 
     # id = fields.Str(dump_only=True)

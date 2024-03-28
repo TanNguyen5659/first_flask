@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, jsonify
 from flask.views import MethodView
 from uuid import uuid4
 from flask_smorest import abort
@@ -8,6 +8,7 @@ from . import bp
 
 from db import cars
 from models.car_model import CarModel
+from flask_jwt_extended import create_access_token, unset_jwt_cookies
 
 @bp.route('/car/')
 class CarList(MethodView):
@@ -67,3 +68,20 @@ class Car(MethodView):
         #     return { 'car gone': f" is no more. . . " }, 202
         # return { 'err' : "can't delete that car they aren't there. . . " } , 400
 
+@bp.post('/login/')
+def login():
+    login_data = request.get_json()
+    carmake = login_data['carmake']
+
+    user = CarModel.query.filter_by(carmake = carmake).first()
+    if user and user.check_password(login_data['password']):
+        access_token = create_access_token(identity=user.id)
+        return {'access token': access_token}, 201
+    
+    abort(400, message = 'Invalid Car Data')
+
+@bp.route("/logout", methods=["POST"])
+def logout():
+    response = jsonify({"msg": "logout successful"})
+    unset_jwt_cookies(response)
+    return response
